@@ -26,6 +26,7 @@ class StoreUserRequest extends FormRequest
             'name' => ['nullable', 'string', 'max:255'],
             'username' => ['required', 'string', 'max:100', 'alpha_dash', 'unique:users,username'],
             'email' => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
+            'phone' => ['nullable', 'string', 'max:30'],
             'password' => ['required', 'string', Password::default()],
             'role_id' => ['nullable', 'integer'],
             'status' => ['nullable', 'integer'],

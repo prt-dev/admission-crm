@@ -7,10 +7,10 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Requests\User\UpdateUserStatusRequest;
 use App\Http\Resources\UserResource;
+use App\Responses\ApiResponse;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -25,7 +25,7 @@ class UserController extends Controller
     /**
      * Display a listing of users.
      */
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(Request $request): JsonResponse
     {
         $filters = [
             'search' => $request->query('search'),
@@ -38,7 +38,11 @@ class UserController extends Controller
         $perPage = (int) $request->query('per_page', 15);
         $users = $this->userService->getPaginatedUsers($perPage, ['*'], $filters);
 
-        return UserResource::collection($users);
+        return ApiResponse::paginate(
+            $users,
+            UserResource::class,
+            'Users retrieved successfully.'
+        );
     }
 
     /**
@@ -48,9 +52,11 @@ class UserController extends Controller
     {
         $user = $this->userService->createUser($request->validated());
 
-        return (new UserResource($user))
-            ->response()
-            ->setStatusCode(Response::HTTP_CREATED);
+        return ApiResponse::success(
+            new UserResource($user),
+            'User created successfully.',
+            Response::HTTP_CREATED
+        );
     }
 
     /**
@@ -61,12 +67,13 @@ class UserController extends Controller
         $user = $this->userService->getUserById($id);
 
         if (!$user) {
-            return response()->json([
-                'message' => 'User not found.',
-            ], Response::HTTP_NOT_FOUND);
+            return ApiResponse::error('User not found.', Response::HTTP_NOT_FOUND);
         }
 
-        return (new UserResource($user))->response();
+        return ApiResponse::success(
+            new UserResource($user),
+            'User retrieved successfully.'
+        );
     }
 
     /**
@@ -77,12 +84,13 @@ class UserController extends Controller
         $user = $this->userService->updateUser($id, $request->validated());
 
         if (!$user) {
-            return response()->json([
-                'message' => 'User not found or update failed.',
-            ], Response::HTTP_NOT_FOUND);
+            return ApiResponse::error('User not found or update failed.', Response::HTTP_NOT_FOUND);
         }
 
-        return (new UserResource($user))->response();
+        return ApiResponse::success(
+            new UserResource($user),
+            'User updated successfully.'
+        );
     }
 
     /**
@@ -93,14 +101,13 @@ class UserController extends Controller
         $deleted = $this->userService->deleteUser($id);
 
         if (!$deleted) {
-            return response()->json([
-                'message' => 'User not found or deletion failed.',
-            ], Response::HTTP_NOT_FOUND);
+            return ApiResponse::error('User not found or deletion failed.', Response::HTTP_NOT_FOUND);
         }
 
-        return response()->json([
-            'message' => 'User deleted successfully.',
-        ], Response::HTTP_OK);
+        return ApiResponse::success(
+            null,
+            'User deleted successfully.'
+        );
     }
 
     /**
@@ -111,12 +118,13 @@ class UserController extends Controller
         $user = $this->userService->updateUserStatus($id, $request->validated()['status']);
 
         if (!$user) {
-            return response()->json([
-                'message' => 'User not found.',
-            ], Response::HTTP_NOT_FOUND);
+            return ApiResponse::error('User not found.', Response::HTTP_NOT_FOUND);
         }
 
-        return (new UserResource($user))->response();
+        return ApiResponse::success(
+            new UserResource($user),
+            'User status updated successfully.'
+        );
     }
 
     /**
@@ -127,14 +135,12 @@ class UserController extends Controller
         $user = $this->userService->recordLastLogin($id);
 
         if (!$user) {
-            return response()->json([
-                'message' => 'User not found.',
-            ], Response::HTTP_NOT_FOUND);
+            return ApiResponse::error('User not found.', Response::HTTP_NOT_FOUND);
         }
 
-        return response()->json([
-            'message' => 'Last login updated successfully.',
-            'user' => new UserResource($user),
-        ], Response::HTTP_OK);
+        return ApiResponse::success(
+            new UserResource($user),
+            'Last login updated successfully.'
+        );
     }
 }

@@ -19,6 +19,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'System Administrator',
                 'email' => 'admin@admissioncrm.local',
+                'phone' => '9876543210',
                 'password' => Hash::make('Admin@12345'),
                 'role_id' => 1,
                 'status' => 1,
@@ -32,6 +33,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Admission Counselor',
                 'email' => 'counselor@admissioncrm.local',
+                'phone' => '9876543211',
                 'password' => Hash::make('Counselor@12345'),
                 'role_id' => 2,
                 'status' => 1,

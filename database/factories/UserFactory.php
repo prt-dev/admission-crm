@@ -27,8 +27,9 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'username' => fake()->unique()->userName(),
             'email' => fake()->unique()->safeEmail(),
+            'phone' => fake()->optional(0.8)->numerify('98########'),
             'password' => static::$password ??= Hash::make('password'),
-            'role_id' => fake()->numberBetween(1, 5),
+            'role_id' => fake()->numberBetween(1, 4),
             'status' => 1,
             'last_login_at' => fake()->optional(0.7)->dateTimeBetween('-1 month', 'now'),
         ];

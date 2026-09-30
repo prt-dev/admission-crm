@@ -7,6 +7,7 @@ use Database\Factories\UserFactory;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -24,6 +25,7 @@ class User extends Authenticatable
         'name',
         'email',
         'username',
+        'phone',
         'password',
         'role_id',
         'status',
@@ -56,6 +58,38 @@ class User extends Authenticatable
     }
 
     /**
+     * Code-level relationship with Role.
+     */
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    /**
+     * Check if user has a specific permission.
+     */
+    public function hasPermission(string $permissionSlug): bool
+    {
+        if (!$this->role) {
+            return false;
+        }
+
+        // Check if role has wildcard superadmin permission
+        $rolePermissions = $this->role->permissions ?? [];
+        if (in_array('*', $rolePermissions) || in_array($permissionSlug, $rolePermissions)) {
+            return true;
+        }
+
+        // Also check role_permissions relation if loaded or queried
+        if ($this->role->relationLoaded('permissions')) {
+            return $this->role->permissions->contains('slug', $permissionSlug)
+                || $this->role->permissions->contains('slug', '*');
+        }
+
+        return $this->role->permissions()->where('slug', $permissionSlug)->exists();
+    }
+
+    /**
      * Scope a query to only include active users.
      */
     public function scopeActive(Builder $query): Builder
@@ -80,7 +114,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Scope a query to search users by username, name, or email.
+     * Scope a query to search users by username, name, email, or phone.
      */
     public function scopeSearch(Builder $query, ?string $term): Builder
     {
@@ -91,7 +125,8 @@ class User extends Authenticatable
         return $query->where(function (Builder $q) use ($term) {
             $q->where('username', 'like', "%{$term}%")
               ->orWhere('name', 'like', "%{$term}%")
-              ->orWhere('email', 'like', "%{$term}%");
+              ->orWhere('email', 'like', "%{$term}%")
+              ->orWhere('phone', 'like', "%{$term}%");
         });
     }
 
