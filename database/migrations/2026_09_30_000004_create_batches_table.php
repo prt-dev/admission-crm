@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('code')->unique();
-            $table->unsignedBigInteger('course_id')->index(); // code-level relation with courses
+            $table->unsignedBigInteger('course_id')->nullable()->index(); // legacy column; relations are in batch_courses
+            $table->unsignedBigInteger('academic_session_id')->nullable()->index(); // code-level relation with academic_sessions
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
             $table->string('timing')->nullable(); // e.g., "09:00 AM - 01:00 PM"

@@ -54,6 +54,20 @@ class PermissionSeeder extends Seeder
             ['name' => 'Edit Admissions', 'slug' => 'admissions.edit', 'module' => 'admissions', 'description' => 'Update student admission details'],
             ['name' => 'Delete Admissions', 'slug' => 'admissions.delete', 'module' => 'admissions', 'description' => 'Delete admission records'],
             ['name' => 'Record Payments', 'slug' => 'admissions.payment', 'module' => 'admissions', 'description' => 'Record and manage course fee payments'],
+
+            // Attendance Management
+            ['name' => 'View Attendances', 'slug' => 'attendances.view', 'module' => 'attendances', 'description' => 'View attendance logs and statistics'],
+            ['name' => 'Create Attendance', 'slug' => 'attendances.create', 'module' => 'attendances', 'description' => 'Record attendance for students'],
+            ['name' => 'Edit Attendance', 'slug' => 'attendances.edit', 'module' => 'attendances', 'description' => 'Update attendance records'],
+            ['name' => 'Delete Attendance', 'slug' => 'attendances.delete', 'module' => 'attendances', 'description' => 'Delete attendance records'],
+            ['name' => 'Mark Batch Attendance', 'slug' => 'attendances.mark', 'module' => 'attendances', 'description' => 'Mark attendance in bulk for a batch session'],
+
+            // Academic Session Management
+            ['name' => 'View Academic Sessions', 'slug' => 'sessions.view', 'module' => 'sessions', 'description' => 'View academic session years and cohorts'],
+            ['name' => 'Create Academic Session', 'slug' => 'sessions.create', 'module' => 'sessions', 'description' => 'Add new academic sessions'],
+            ['name' => 'Edit Academic Session', 'slug' => 'sessions.edit', 'module' => 'sessions', 'description' => 'Update academic session details'],
+            ['name' => 'Delete Academic Session', 'slug' => 'sessions.delete', 'module' => 'sessions', 'description' => 'Delete academic sessions'],
+            ['name' => 'Set Current Session', 'slug' => 'sessions.set_current', 'module' => 'sessions', 'description' => 'Set an academic session as active/current'],
         ];
 
         $createdPermissions = [];
@@ -87,7 +101,7 @@ class PermissionSeeder extends Seeder
             $counselorSlugs = [
                 'leads.view', 'leads.create', 'leads.edit', 'leads.assign', 'leads.follow_up',
                 'admissions.view', 'admissions.create', 'admissions.edit', 'admissions.payment',
-                'courses.view', 'batches.view',
+                'courses.view', 'batches.view', 'attendances.view', 'sessions.view',
             ];
             RolePermission::where('role_id', $counselor->id)->delete();
             foreach ($counselorSlugs as $slug) {
@@ -104,7 +118,11 @@ class PermissionSeeder extends Seeder
 
         // Instructor permissions
         if ($instructor) {
-            $instructorSlugs = ['batches.view', 'courses.view', 'admissions.view'];
+            $instructorSlugs = [
+                'batches.view', 'courses.view', 'admissions.view',
+                'attendances.view', 'attendances.create', 'attendances.edit', 'attendances.mark',
+                'sessions.view',
+            ];
             RolePermission::where('role_id', $instructor->id)->delete();
             foreach ($instructorSlugs as $slug) {
                 if (isset($createdPermissions[$slug])) {
@@ -120,7 +138,7 @@ class PermissionSeeder extends Seeder
 
         // Student permissions
         if ($student) {
-            $studentSlugs = ['admissions.view'];
+            $studentSlugs = ['admissions.view', 'attendances.view', 'sessions.view'];
             RolePermission::where('role_id', $student->id)->delete();
             foreach ($studentSlugs as $slug) {
                 if (isset($createdPermissions[$slug])) {

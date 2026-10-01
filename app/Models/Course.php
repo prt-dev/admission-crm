@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Course extends Model
@@ -42,11 +43,11 @@ class Course extends Model
     }
 
     /**
-     * Code-level relationship with Batches.
+     * Code-level relationship with Batches (Many-to-Many via pivot table).
      */
-    public function batches(): HasMany
+    public function batches(): BelongsToMany
     {
-        return $this->hasMany(Batch::class, 'course_id');
+        return $this->belongsToMany(Batch::class, 'batch_courses', 'course_id', 'batch_id')->withTimestamps();
     }
 
     /**
@@ -55,6 +56,14 @@ class Course extends Model
     public function admissions(): HasMany
     {
         return $this->hasMany(Admission::class, 'course_id');
+    }
+
+    /**
+     * Code-level relationship with Training Sessions.
+     */
+    public function trainingSessions(): HasMany
+    {
+        return $this->hasMany(TrainingSession::class, 'course_id');
     }
 
     /**

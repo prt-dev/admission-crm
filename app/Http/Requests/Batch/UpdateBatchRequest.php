@@ -18,7 +18,8 @@ class UpdateBatchRequest extends FormRequest
         return [
             'name' => ['sometimes', 'required', 'string', 'max:150'],
             'code' => ['sometimes', 'required', 'string', 'max:50', 'unique:batches,code,' . $id],
-            'course_id' => ['sometimes', 'required', 'integer'],
+            'course_ids' => ['nullable', 'array'],
+            'course_ids.*' => ['integer'],
             'start_date' => ['nullable', 'date'],
             'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
             'timing' => ['nullable', 'string', 'max:100'],

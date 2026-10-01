@@ -11,7 +11,8 @@ class BatchRepository implements BatchRepositoryInterface
 {
     public function __construct(
         protected Batch $model
-    ) {}
+    ) {
+    }
 
     public function all(array $columns = ['*']): Collection
     {
@@ -22,7 +23,7 @@ class BatchRepository implements BatchRepositoryInterface
     {
         return $this->model
             ->select($columns)
-            ->with(['course', 'instructor', 'creator'])
+            ->with(['courses', 'instructor', 'creator'])
             ->when(!empty($filters['search']), function ($query) use ($filters) {
                 $query->search($filters['search']);
             })
@@ -39,14 +40,23 @@ class BatchRepository implements BatchRepositoryInterface
             ->paginate($perPage);
     }
 
-    public function findById(int|string $id, array $with = ['course', 'instructor', 'creator']): ?Batch
+    public function findById(int|string $id, array $with = ['courses', 'instructor', 'creator']): ?Batch
     {
         return $this->model->with($with)->find($id);
     }
 
     public function create(array $data): Batch
     {
-        return $this->model->create($data);
+        $courseIds = $data['course_ids'] ?? null;
+        unset($data['course_ids']);
+
+        $batch = $this->model->create($data);
+
+        if ($courseIds !== null) {
+            $batch->courses()->sync($courseIds);
+        }
+
+        return $batch->fresh(['courses', 'instructor', 'creator']);
     }
 
     public function update(int|string $id, array $data): ?Batch
@@ -57,10 +67,17 @@ class BatchRepository implements BatchRepositoryInterface
             return null;
         }
 
+        $courseIds = $data['course_ids'] ?? null;
+        unset($data['course_ids']);
+
         $batch->fill($data);
         $batch->save();
 
-        return $batch->fresh(['course', 'instructor', 'creator']);
+        if ($courseIds !== null) {
+            $batch->courses()->sync($courseIds);
+        }
+
+        return $batch->fresh(['courses', 'instructor', 'creator']);
     }
 
     public function delete(int|string $id): bool

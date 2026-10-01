@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('lead_id')->nullable()->index(); // code-level relation with leads (if converted)
             $table->unsignedBigInteger('course_id')->index(); // code-level relation with courses
             $table->unsignedBigInteger('batch_id')->nullable()->index(); // code-level relation with batches
+            $table->unsignedBigInteger('academic_session_id')->nullable()->index(); // code-level relation with academic_sessions
             
             // Student personal and demographic details
             $table->string('first_name');

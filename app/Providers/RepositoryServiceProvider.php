@@ -2,14 +2,18 @@
 
 namespace App\Providers;
 
+use App\Repositories\Contracts\AcademicSessionRepositoryInterface;
 use App\Repositories\Contracts\AdmissionRepositoryInterface;
+use App\Repositories\Contracts\AttendanceRepositoryInterface;
 use App\Repositories\Contracts\BatchRepositoryInterface;
 use App\Repositories\Contracts\CourseRepositoryInterface;
 use App\Repositories\Contracts\LeadRepositoryInterface;
 use App\Repositories\Contracts\PermissionRepositoryInterface;
 use App\Repositories\Contracts\RoleRepositoryInterface;
 use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\Eloquent\AcademicSessionRepository;
 use App\Repositories\Eloquent\AdmissionRepository;
+use App\Repositories\Eloquent\AttendanceRepository;
 use App\Repositories\Eloquent\BatchRepository;
 use App\Repositories\Eloquent\CourseRepository;
 use App\Repositories\Eloquent\LeadRepository;
@@ -33,6 +37,8 @@ class RepositoryServiceProvider extends ServiceProvider
         CourseRepositoryInterface::class => CourseRepository::class,
         BatchRepositoryInterface::class => BatchRepository::class,
         AdmissionRepositoryInterface::class => AdmissionRepository::class,
+        AttendanceRepositoryInterface::class => AttendanceRepository::class,
+        AcademicSessionRepositoryInterface::class => AcademicSessionRepository::class,
     ];
 
     /**
@@ -47,6 +53,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(CourseRepositoryInterface::class, CourseRepository::class);
         $this->app->bind(BatchRepositoryInterface::class, BatchRepository::class);
         $this->app->bind(AdmissionRepositoryInterface::class, AdmissionRepository::class);
+        $this->app->bind(AttendanceRepositoryInterface::class, AttendanceRepository::class);
+        $this->app->bind(AcademicSessionRepositoryInterface::class, AcademicSessionRepository::class);
     }
 
     /**

@@ -30,7 +30,7 @@ class ApiResponse
         ];
 
         if ($message !== null) {
-            $response['message'] = $message;
+            $response['message'] = "data test";
         }
 
         $response['data'] = $data;

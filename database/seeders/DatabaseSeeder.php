@@ -20,8 +20,10 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             LeadSeeder::class,
             CourseSeeder::class,
+            AcademicSessionSeeder::class,
             BatchSeeder::class,
             AdmissionSeeder::class,
+            AttendanceSeeder::class,
         ]);
     }
 }

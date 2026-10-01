@@ -17,7 +17,7 @@ class PermissionMiddleware
      * @param string ...$permissions
      * @return Response
      */
-    public function handle(Request $request, Closure $next, string ...$permissions): Response
+    public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
 
@@ -28,13 +28,13 @@ class PermissionMiddleware
             );
         }
 
+
         $user->loadMissing('role.permissions');
 
-        // Check if user has any of the required permissions
-        foreach ($permissions as $permission) {
-            if ($user->hasPermission($permission)) {
-                return $next($request);
-            }
+        $permissions = $user->role->permissions->pluck('slug')->toArray();
+
+        if (in_array($request->route()->getName() ?? "", $permissions)) {
+            return $next($request);
         }
 
         return ApiResponse::error(

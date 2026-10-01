@@ -13,13 +13,14 @@ class BatchResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
-            'course_id' => $this->course_id,
-            'course' => $this->whenLoaded('course', function () {
-                return $this->course ? [
-                    'id' => $this->course->id,
-                    'name' => $this->course->name,
-                    'code' => $this->course->code,
-                ] : null;
+            'courses' => $this->whenLoaded('courses', function () {
+                return $this->courses->map(function ($course) {
+                    return [
+                        'id' => $course->id,
+                        'name' => $course->name,
+                        'code' => $course->code,
+                    ];
+                });
             }),
             'start_date' => $this->start_date?->format('Y-m-d'),
             'end_date' => $this->end_date?->format('Y-m-d'),

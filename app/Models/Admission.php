@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Admission extends Model
 {
@@ -23,6 +24,7 @@ class Admission extends Model
         'lead_id',
         'course_id',
         'batch_id',
+        'academic_session_id',
         'first_name',
         'last_name',
         'email',
@@ -61,6 +63,7 @@ class Admission extends Model
             'lead_id' => 'integer',
             'course_id' => 'integer',
             'batch_id' => 'integer',
+            'academic_session_id' => 'integer',
             'admitted_by' => 'integer',
             'payment_status' => 'integer',
             'status' => 'integer',
@@ -107,6 +110,14 @@ class Admission extends Model
     }
 
     /**
+     * Code-level relationship with Academic Session.
+     */
+    public function academicSession(): BelongsTo
+    {
+        return $this->belongsTo(AcademicSession::class, 'academic_session_id');
+    }
+
+    /**
      * Code-level relationship with Admitting counselor User.
      */
     public function counselor(): BelongsTo
@@ -148,6 +159,14 @@ class Admission extends Model
               ->orWhere('phone', 'like', "%{$term}%")
               ->orWhere('city', 'like', "%{$term}%");
         });
+    }
+
+    /**
+     * Code-level relationship with Attendances.
+     */
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class, 'admission_id');
     }
 
     /**

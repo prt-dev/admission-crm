@@ -19,7 +19,8 @@ class JwtMiddleware
     public function __construct(
         protected JwtService $jwtService,
         protected AuthService $authService
-    ) {}
+    ) {
+    }
 
     /**
      * Handle an incoming request.
@@ -45,7 +46,7 @@ class JwtMiddleware
 
             $user = $this->authService->getUserFromPayload($payload);
 
-            if (!$user || $user->status !== 1) {
+            if (!$user || $user->status == 0) {
                 return ApiResponse::error(
                     'User not found or inactive account.',
                     Response::HTTP_UNAUTHORIZED
@@ -53,7 +54,7 @@ class JwtMiddleware
             }
 
             // Set user on request
-            $request->setUserResolver(fn () => $user);
+            $request->setUserResolver(fn() => $user);
             $request->attributes->set('jwt', $payload);
             $request->attributes->set('auth_user', $user);
 

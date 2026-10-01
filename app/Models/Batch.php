@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Batch extends Model
@@ -20,7 +21,7 @@ class Batch extends Model
     protected $fillable = [
         'name',
         'code',
-        'course_id',
+        'academic_session_id',
         'start_date',
         'end_date',
         'timing',
@@ -38,7 +39,7 @@ class Batch extends Model
     protected function casts(): array
     {
         return [
-            'course_id' => 'integer',
+            'academic_session_id' => 'integer',
             'capacity' => 'integer',
             'status' => 'integer',
             'instructor_id' => 'integer',
@@ -49,11 +50,19 @@ class Batch extends Model
     }
 
     /**
-     * Code-level relationship with Course.
+     * Code-level relationship with Academic Session.
      */
-    public function course(): BelongsTo
+    public function academicSession(): BelongsTo
     {
-        return $this->belongsTo(Course::class, 'course_id');
+        return $this->belongsTo(AcademicSession::class, 'academic_session_id');
+    }
+
+    /**
+     * Code-level relationship with Courses (Many-to-Many via pivot table).
+     */
+    public function courses(): BelongsToMany
+    {
+        return $this->belongsToMany(Course::class, 'batch_courses', 'batch_id', 'course_id')->withTimestamps();
     }
 
     /**
@@ -81,6 +90,14 @@ class Batch extends Model
     }
 
     /**
+     * Code-level relationship with Attendances.
+     */
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class, 'batch_id');
+    }
+
+    /**
      * Scope a query to filter batches by status.
      */
     public function scopeByStatus(Builder $query, int $status): Builder
@@ -93,7 +110,9 @@ class Batch extends Model
      */
     public function scopeByCourse(Builder $query, int $courseId): Builder
     {
-        return $query->where('course_id', $courseId);
+        return $query->whereHas('courses', function (Builder $q) use ($courseId) {
+            $q->where('courses.id', $courseId);
+        });
     }
 
     /**
@@ -107,7 +126,7 @@ class Batch extends Model
 
         return $query->where(function (Builder $q) use ($term) {
             $q->where('name', 'like', "%{$term}%")
-              ->orWhere('code', 'like', "%{$term}%");
+                ->orWhere('code', 'like', "%{$term}%");
         });
     }
 }

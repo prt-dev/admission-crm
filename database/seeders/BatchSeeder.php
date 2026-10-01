@@ -20,7 +20,7 @@ class BatchSeeder extends Seeder
             [
                 'name' => 'LESE Batch - Spring 2026 Morning',
                 'code' => 'BATCH-LESE-2026-M1',
-                'course_id' => $course1?->id ?? 1,
+                'course_ids' => array_filter([$course1?->id]),
                 'start_date' => now()->startOfMonth()->toDateString(),
                 'end_date' => now()->addMonths(6)->endOfMonth()->toDateString(),
                 'timing' => '09:00 AM - 01:00 PM',
@@ -32,7 +32,7 @@ class BatchSeeder extends Seeder
             [
                 'name' => 'LESE Batch - Spring 2026 Evening',
                 'code' => 'BATCH-LESE-2026-E1',
-                'course_id' => $course1?->id ?? 1,
+                'course_ids' => array_filter([$course1?->id]),
                 'start_date' => now()->addWeeks(2)->toDateString(),
                 'end_date' => now()->addMonths(6)->toDateString(),
                 'timing' => '05:00 PM - 08:30 PM',
@@ -44,7 +44,7 @@ class BatchSeeder extends Seeder
             [
                 'name' => 'Advanced Elevator Batch - 2026',
                 'code' => 'BATCH-AETA-2026-A1',
-                'course_id' => $course2?->id ?? 2,
+                'course_ids' => array_filter([$course2?->id]),
                 'start_date' => now()->subMonth()->toDateString(),
                 'end_date' => now()->addMonths(11)->toDateString(),
                 'timing' => '10:00 AM - 03:00 PM',
@@ -56,7 +56,7 @@ class BatchSeeder extends Seeder
             [
                 'name' => 'Diploma VT Cohort - 2026',
                 'code' => 'BATCH-DVTS-2026-01',
-                'course_id' => $course3?->id ?? 3,
+                'course_ids' => array_filter([$course3?->id]),
                 'start_date' => now()->addMonth()->toDateString(),
                 'end_date' => now()->addYears(2)->toDateString(),
                 'timing' => '09:30 AM - 04:30 PM',
@@ -68,7 +68,13 @@ class BatchSeeder extends Seeder
         ];
 
         foreach ($batches as $data) {
-            Batch::updateOrCreate(['code' => $data['code']], $data);
+            $courseIds = $data['course_ids'] ?? [];
+            unset($data['course_ids']);
+
+            $batch = Batch::updateOrCreate(['code' => $data['code']], $data);
+            if (!empty($courseIds)) {
+                $batch->courses()->sync($courseIds);
+            }
         }
     }
 }

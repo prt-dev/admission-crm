@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\AcademicSessionController;
 use App\Http\Controllers\Api\AdmissionController;
+use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\CourseController;
@@ -93,4 +95,27 @@ Route::prefix('v1')->group(function () {
     Route::delete('admissions/{id}', [AdmissionController::class, 'destroy'])->name('admissions.destroy');
     Route::patch('admissions/{id}/status', [AdmissionController::class, 'updateStatus'])->name('admissions.update-status');
     Route::post('admissions/{id}/payment', [AdmissionController::class, 'recordPayment'])->name('admissions.record-payment');
+
+    // Attendance Module Routes
+    Route::get('attendances', [AttendanceController::class, 'index'])->name('attendances.index');
+    Route::post('attendances', [AttendanceController::class, 'store'])->name('attendances.store');
+    Route::post('attendances/bulk', [AttendanceController::class, 'bulkStore'])->name('attendances.bulk');
+    Route::get('attendances/batch/{batchId}', [AttendanceController::class, 'batchAttendance'])->name('attendances.batch');
+    Route::get('attendances/batch/{batchId}/summary', [AttendanceController::class, 'batchSummary'])->name('attendances.batch.summary');
+    Route::get('attendances/student/{admissionId}/summary', [AttendanceController::class, 'studentSummary'])->name('attendances.student.summary');
+    Route::get('attendances/{id}', [AttendanceController::class, 'show'])->name('attendances.show');
+    Route::put('attendances/{id}', [AttendanceController::class, 'update'])->name('attendances.update');
+    Route::delete('attendances/{id}', [AttendanceController::class, 'destroy'])->name('attendances.destroy');
+    Route::patch('attendances/{id}/status', [AttendanceController::class, 'updateStatus'])->name('attendances.update-status');
+
+    // Academic Sessions Module Routes
+    Route::get('sessions', [AcademicSessionController::class, 'index'])->name('sessions.index');
+    Route::get('sessions/current', [AcademicSessionController::class, 'current'])->name('sessions.current');
+    Route::post('sessions', [AcademicSessionController::class, 'store'])->name('sessions.store');
+    Route::get('sessions/{id}', [AcademicSessionController::class, 'show'])->name('sessions.show');
+    Route::put('sessions/{id}', [AcademicSessionController::class, 'update'])->name('sessions.update');
+    Route::delete('sessions/{id}', [AcademicSessionController::class, 'destroy'])->name('sessions.destroy');
+    Route::patch('sessions/{id}/status', [AcademicSessionController::class, 'updateStatus'])->name('sessions.update-status');
+    Route::post('sessions/{id}/set-current', [AcademicSessionController::class, 'setCurrent'])->name('sessions.set-current');
+    Route::get('sessions/{id}/batches', [AcademicSessionController::class, 'batches'])->name('sessions.batches');
 });

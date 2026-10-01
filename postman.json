@@ -1,0 +1,2449 @@
+{
+	"info": {
+		"_postman_id": "c5d1a890-e71f-4bb2-b5e1-8f438a9942a0",
+		"name": "Admission CRM API Collection",
+		"description": "Comprehensive Postman collection with sample inputs and endpoints for the Admission CRM Laravel API (v1). Includes Auth, Sessions, Courses, Batches, Admissions, Attendance, Leads, Users, and Roles & Permissions.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "session_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "course_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "batch_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "admission_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "lead_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "follow_up_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "attendance_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "role_id",
+			"value": "1",
+			"type": "string"
+		},
+		{
+			"key": "permission_id",
+			"value": "1",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "01. Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"if (response && response.data && response.data.token) {",
+									"    pm.collectionVariables.set('token', response.data.token);",
+									"} else if (response && response.token) {",
+									"    pm.collectionVariables.set('token', response.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"password\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticate user credentials and receive JWT access token. The token is automatically saved to the collection variable `{{token}}`."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Authenticated User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get current logged-in user profile with assigned role and permissions."
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"current_password\": \"password\",\n    \"new_password\": \"NewSecurePass123!\",\n    \"new_password_confirmation\": \"NewSecurePass123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						},
+						"description": "Update password for the current authenticated user."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Invalidate current JWT session token."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02. Academic Sessions",
+			"item": [
+				{
+					"name": "Get All Academic Sessions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sessions?search=&status=&page=1&per_page=15&sort_by=start_date&sort_order=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Filter by session name or code"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "1=Upcoming, 2=Active, 3=Completed, 4=Archived"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "sort_by",
+									"value": "start_date"
+								},
+								{
+									"key": "sort_order",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "List all institutional academic sessions with pagination, filtering, and sorting."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Academic Session",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sessions/current",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions",
+								"current"
+							]
+						},
+						"description": "Fetch the currently active/primary institutional academic session."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Academic Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Academic Session 2026-2027\",\n    \"code\": \"SESS-2026-27\",\n    \"start_date\": \"2026-04-01\",\n    \"end_date\": \"2027-03-31\",\n    \"is_current\": true,\n    \"status\": 2,\n    \"description\": \"Main academic session for 2026-2027 diploma cohorts and elevator training batches.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sessions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions"
+							]
+						},
+						"description": "Create a new institutional academic session cycle."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Academic Session by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sessions/{{session_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions",
+								"{{session_id}}"
+							]
+						},
+						"description": "Retrieve details of a specific academic session."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Academic Session",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Academic Session 2026-2027 (Updated)\",\n    \"code\": \"SESS-2026-27\",\n    \"start_date\": \"2026-04-01\",\n    \"end_date\": \"2027-03-31\",\n    \"is_current\": true,\n    \"status\": 2,\n    \"description\": \"Updated session cycle timeline and description.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sessions/{{session_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions",
+								"{{session_id}}"
+							]
+						},
+						"description": "Update attributes of an existing academic session."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Academic Session Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/sessions/{{session_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions",
+								"{{session_id}}",
+								"status"
+							]
+						},
+						"description": "Change session status: 1=Upcoming, 2=Active, 3=Completed, 4=Archived."
+					},
+					"response": []
+				},
+				{
+					"name": "Set Current Active Session",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sessions/{{session_id}}/set-current",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions",
+								"{{session_id}}",
+								"set-current"
+							]
+						},
+						"description": "Set this academic session as the default active institutional session and unmark previous ones."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Batches Under Academic Session",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sessions/{{session_id}}/batches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions",
+								"{{session_id}}",
+								"batches"
+							]
+						},
+						"description": "List all cohorts / batches scheduled under this academic session."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Academic Session",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sessions/{{session_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sessions",
+								"{{session_id}}"
+							]
+						},
+						"description": "Delete an academic session record."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03. Courses",
+			"item": [
+				{
+					"name": "Get All Courses",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/courses?search=&status=&page=1&per_page=15",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Filter by course name or code"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "1=Active, 2=Inactive"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "Retrieve paginated list of courses."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Course",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Lift & Escalator Safety Engineering (LESE)\",\n    \"code\": \"LESE-101\",\n    \"description\": \"Comprehensive hands-on safety, commissioning, and maintenance standards for vertical transport.\",\n    \"duration\": \"6 Months\",\n    \"fee\": 45000.00,\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/courses",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses"
+							]
+						},
+						"description": "Create a new course offering."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/courses/{{course_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses",
+								"{{course_id}}"
+							]
+						},
+						"description": "Fetch details of a single course."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Lift & Escalator Safety Engineering (Advanced)\",\n    \"code\": \"LESE-101\",\n    \"description\": \"Updated syllabus with modern controller diagnostic protocols and smart elevator telematics.\",\n    \"duration\": \"6 Months\",\n    \"fee\": 48000.00,\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/courses/{{course_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses",
+								"{{course_id}}"
+							]
+						},
+						"description": "Update existing course information."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Course Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/courses/{{course_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses",
+								"{{course_id}}",
+								"status"
+							]
+						},
+						"description": "Toggle course status: 1=Active, 2=Inactive."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Course",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/courses/{{course_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"courses",
+								"{{course_id}}"
+							]
+						},
+						"description": "Delete a course record."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04. Batches",
+			"item": [
+				{
+					"name": "Get All Batches",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/batches?search=&course_id=&status=&page=1&per_page=15&sort_by=created_at&sort_order=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Filter by batch name or code"
+								},
+								{
+									"key": "course_id",
+									"value": "",
+									"description": "Filter by associated course ID"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "1=Upcoming, 2=Ongoing, 3=Completed, 4=Cancelled"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "sort_by",
+									"value": "created_at"
+								},
+								{
+									"key": "sort_order",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "List batches with associated courses (many-to-many), academic session, instructor, and capacity."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Batch",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"LESE Batch - Spring 2026 Morning\",\n    \"code\": \"BATCH-LESE-2026-M1\",\n    \"academic_session_id\": 1,\n    \"course_ids\": [1],\n    \"start_date\": \"2026-04-01\",\n    \"end_date\": \"2026-09-30\",\n    \"timing\": \"09:00 AM - 01:00 PM\",\n    \"capacity\": 30,\n    \"status\": 2,\n    \"instructor_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/batches",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches"
+							]
+						},
+						"description": "Create a new batch cohort with linked `course_ids` array."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Batch by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/batches/{{batch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"{{batch_id}}"
+							]
+						},
+						"description": "Retrieve specific batch details and loaded course relationships."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Batch",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"LESE Batch - Spring 2026 Morning (Updated)\",\n    \"code\": \"BATCH-LESE-2026-M1\",\n    \"academic_session_id\": 1,\n    \"course_ids\": [1],\n    \"start_date\": \"2026-04-01\",\n    \"end_date\": \"2026-09-30\",\n    \"timing\": \"09:00 AM - 01:00 PM\",\n    \"capacity\": 35,\n    \"status\": 2,\n    \"instructor_id\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/batches/{{batch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"{{batch_id}}"
+							]
+						},
+						"description": "Update batch schedule, capacity, instructor, or sync courses."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Batch Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/batches/{{batch_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"{{batch_id}}",
+								"status"
+							]
+						},
+						"description": "Update batch lifecycle status: 1=Upcoming, 2=Ongoing, 3=Completed, 4=Cancelled."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Batch",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/batches/{{batch_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"batches",
+								"{{batch_id}}"
+							]
+						},
+						"description": "Delete a batch record."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "05. Leads & Inquiries",
+			"item": [
+				{
+					"name": "Get All Leads",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/leads?search=&status=&source=&course_interested=&assigned_to=&page=1&per_page=15",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by name, email, or phone"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "1=New, 2=Contacted, 3=Interested, 4=Converted, 5=Closed"
+								},
+								{
+									"key": "source",
+									"value": "",
+									"description": "e.g., Website, Referral, Walk-in, Social Media"
+								},
+								{
+									"key": "course_interested",
+									"value": ""
+								},
+								{
+									"key": "assigned_to",
+									"value": "",
+									"description": "Counselor User ID"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "List student inquiries and prospective leads."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Rahul Sharma\",\n    \"email\": \"rahul.sharma@example.com\",\n    \"phone\": \"+91 98765 43210\",\n    \"alternate_phone\": \"+91 98765 43211\",\n    \"course_interested\": \"Lift & Escalator Safety Engineering\",\n    \"source\": \"Website Inquiry\",\n    \"status\": 1,\n    \"priority\": 2,\n    \"city\": \"New Delhi\",\n    \"qualification\": \"Diploma in Electrical Engineering\",\n    \"notes\": \"Interested in upcoming morning batch. Requested syllabus and fee structure.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads"
+							]
+						},
+						"description": "Capture a new student lead/inquiry."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lead by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/leads/{{lead_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads",
+								"{{lead_id}}"
+							]
+						},
+						"description": "Retrieve lead details with history."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Lead",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Rahul Sharma\",\n    \"email\": \"rahul.sharma@example.com\",\n    \"phone\": \"+91 98765 43210\",\n    \"course_interested\": \"Lift & Escalator Safety Engineering\",\n    \"source\": \"Website Inquiry\",\n    \"status\": 2,\n    \"priority\": 3,\n    \"city\": \"New Delhi\",\n    \"qualification\": \"Diploma in Electrical Engineering\",\n    \"notes\": \"Spoke on phone, ready for demo session this Saturday.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/{{lead_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads",
+								"{{lead_id}}"
+							]
+						},
+						"description": "Update lead details."
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Lead to Counselor",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"assigned_to\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/{{lead_id}}/assign",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads",
+								"{{lead_id}}",
+								"assign"
+							]
+						},
+						"description": "Assign lead to an admission counselor user."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Lead Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 3\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/{{lead_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads",
+								"{{lead_id}}",
+								"status"
+							]
+						},
+						"description": "Update lead status: 1=New, 2=Contacted, 3=Interested, 4=Converted, 5=Closed."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Lead Follow-ups",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/leads/{{lead_id}}/follow-ups",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads",
+								"{{lead_id}}",
+								"follow-ups"
+							]
+						},
+						"description": "Get all scheduled and completed follow-up interaction records for this lead."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Follow-up to Lead",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"follow_up_date\": \"2026-10-05 11:30:00\",\n    \"type\": \"Phone Call\",\n    \"remarks\": \"Follow up regarding batch start date and installment options.\",\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/{{lead_id}}/follow-ups",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads",
+								"{{lead_id}}",
+								"follow-ups"
+							]
+						},
+						"description": "Log a follow-up call, email, or meeting for a lead."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Follow-up Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 2,\n    \"remarks\": \"Call completed. Candidate will submit registration documents tomorrow.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/leads/{{lead_id}}/follow-ups/{{follow_up_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads",
+								"{{lead_id}}",
+								"follow-ups",
+								"{{follow_up_id}}",
+								"status"
+							]
+						},
+						"description": "Mark follow-up as completed (2), missed (3), or rescheduled."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Lead",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/leads/{{lead_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"leads",
+								"{{lead_id}}"
+							]
+						},
+						"description": "Delete lead record."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "06. Admissions",
+			"item": [
+				{
+					"name": "Get All Admissions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admissions?search=&course_id=&batch_id=&status=&page=1&per_page=15&sort_by=admission_date&sort_order=desc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admissions"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search student name, email, admission/reg number"
+								},
+								{
+									"key": "course_id",
+									"value": "",
+									"description": "Filter by Course ID"
+								},
+								{
+									"key": "batch_id",
+									"value": "",
+									"description": "Filter by Batch ID"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "1=Enrolled, 2=Active, 3=Completed, 4=Dropped"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								},
+								{
+									"key": "sort_by",
+									"value": "admission_date"
+								},
+								{
+									"key": "sort_order",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "List enrolled student admissions with fee, batch, and course relations."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Admission",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"admission_number\": \"ADM-2026-0010\",\n    \"registration_number\": \"REG-2026-0010\",\n    \"lead_id\": 1,\n    \"course_id\": 1,\n    \"batch_id\": 1,\n    \"first_name\": \"Aarav\",\n    \"last_name\": \"Patel\",\n    \"email\": \"aarav.patel@example.com\",\n    \"phone\": \"+91 91234 56789\",\n    \"alternate_phone\": \"+91 91234 56780\",\n    \"dob\": \"2002-05-14\",\n    \"gender\": \"Male\",\n    \"guardian_name\": \"Vikram Patel\",\n    \"guardian_phone\": \"+91 98980 12345\",\n    \"address\": \"Flat 302, Green Avenue\",\n    \"city\": \"Ahmedabad\",\n    \"state\": \"Gujarat\",\n    \"pincode\": \"380015\",\n    \"qualification\": \"B.Tech Mechanical\",\n    \"admission_date\": \"2026-04-01\",\n    \"course_fee\": 45000.00,\n    \"discount_amount\": 5000.00,\n    \"paid_amount\": 20000.00,\n    \"status\": 1,\n    \"remarks\": \"Submitted 10th, 12th & Degree certificates. First installment paid via UPI.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admissions"
+							]
+						},
+						"description": "Enroll a student into a course and batch."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Admission by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admissions/{{admission_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admissions",
+								"{{admission_id}}"
+							]
+						},
+						"description": "Get student admission file with financials and batch enrollment."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Admission",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first_name\": \"Aarav\",\n    \"last_name\": \"Patel\",\n    \"email\": \"aarav.patel@example.com\",\n    \"phone\": \"+91 91234 56789\",\n    \"course_id\": 1,\n    \"batch_id\": 1,\n    \"course_fee\": 45000.00,\n    \"discount_amount\": 5000.00,\n    \"paid_amount\": 20000.00,\n    \"status\": 2,\n    \"remarks\": \"Transferred to batch 1. Profile updated.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admissions/{{admission_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admissions",
+								"{{admission_id}}"
+							]
+						},
+						"description": "Update admission details or personal information."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Admission Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 2\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admissions/{{admission_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admissions",
+								"{{admission_id}}",
+								"status"
+							]
+						},
+						"description": "Update student admission status: 1=Enrolled, 2=Active, 3=Completed, 4=Dropped."
+					},
+					"response": []
+				},
+				{
+					"name": "Record Fee Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": 10000.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admissions/{{admission_id}}/payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admissions",
+								"{{admission_id}}",
+								"payment"
+							]
+						},
+						"description": "Increment `paid_amount` and recalculate balance fee for this student admission."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Admission",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/admissions/{{admission_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admissions",
+								"{{admission_id}}"
+							]
+						},
+						"description": "Delete admission record."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "07. Attendance",
+			"item": [
+				{
+					"name": "Get All Attendances",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/attendances?batch_id=&admission_id=&course_id=&date=&type=&status=&page=1&per_page=15",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances"
+							],
+							"query": [
+								{
+									"key": "batch_id",
+									"value": ""
+								},
+								{
+									"key": "admission_id",
+									"value": ""
+								},
+								{
+									"key": "course_id",
+									"value": ""
+								},
+								{
+									"key": "date",
+									"value": "2026-10-01"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"description": "T (Theory), P (Practical), O (Other)"
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "1=Present, 2=Late, 3=Absent, 4=Leave, 5=Holiday"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "Retrieve filtered attendance logs."
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Single Attendance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"admission_id\": 1,\n    \"batch_id\": 1,\n    \"course_id\": 1,\n    \"date\": \"2026-10-01\",\n    \"duration\": 4.0,\n    \"type\": \"P\",\n    \"status\": 1,\n    \"topic_covered\": \"Governor Overspeed Switch Calibration & Buffer Alignment\",\n    \"remarks\": \"Active participation in lab practical session.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/attendances",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances"
+							]
+						},
+						"description": "Mark attendance record for an individual student session."
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Mark Batch Attendance",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"batch_id\": 1,\n    \"course_id\": 1,\n    \"date\": \"2026-10-01\",\n    \"duration\": 4.0,\n    \"type\": \"P\",\n    \"topic_covered\": \"Emergency Braking & Traction Hoist Alignment Lab\",\n    \"students\": [\n        {\n            \"admission_id\": 1,\n            \"status\": 1,\n            \"remarks\": \"Completed rig calibration on time\"\n        },\n        {\n            \"admission_id\": 2,\n            \"status\": 2,\n            \"remarks\": \"Joined 15 minutes late\"\n        },\n        {\n            \"admission_id\": 3,\n            \"status\": 4,\n            \"remarks\": \"Medical leave approved\"\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/attendances/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"bulk"
+							]
+						},
+						"description": "Bulk mark attendance for all enrolled students in a batch session."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Batch Attendance by Date",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/attendances/batch/{{batch_id}}?date=2026-10-01",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"batch",
+								"{{batch_id}}"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2026-10-01"
+								}
+							]
+						},
+						"description": "Retrieve marked student attendance list for a specific batch session date."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Batch Attendance Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/attendances/batch/{{batch_id}}/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"batch",
+								"{{batch_id}}",
+								"summary"
+							]
+						},
+						"description": "Aggregate statistics on total sessions, attendance percentage, and present/late/absent breakdown for the batch."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student Attendance Summary",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/attendances/student/{{admission_id}}/summary",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"student",
+								"{{admission_id}}",
+								"summary"
+							]
+						},
+						"description": "Summary metrics and percentage attendance for an individual student."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Attendance Record by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/attendances/{{attendance_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"{{attendance_id}}"
+							]
+						},
+						"description": "Retrieve specific attendance entry."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Attendance",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 1,\n    \"type\": \"P\",\n    \"duration\": 4.0,\n    \"topic_covered\": \"Emergency Braking & Buffer Calibration Lab\",\n    \"remarks\": \"Verified full session attendance.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/attendances/{{attendance_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"{{attendance_id}}"
+							]
+						},
+						"description": "Update specific attendance entry details."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Attendance Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/attendances/{{attendance_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"{{attendance_id}}",
+								"status"
+							]
+						},
+						"description": "Quick status update for attendance: 1=Present, 2=Late, 3=Absent, 4=Leave, 5=Holiday."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Attendance Record",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/attendances/{{attendance_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"attendances",
+								"{{attendance_id}}"
+							]
+						},
+						"description": "Delete attendance record."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "08. Users",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?search=&role_id=&status=&page=1&per_page=15",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search username, name, email, phone"
+								},
+								{
+									"key": "role_id",
+									"value": ""
+								},
+								{
+									"key": "status",
+									"value": "",
+									"description": "1=Active, 2=Inactive"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "15"
+								}
+							]
+						},
+						"description": "List CRM system users with assigned roles."
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Suresh Verma\",\n    \"username\": \"suresh.instructor\",\n    \"email\": \"suresh.verma@example.com\",\n    \"phone\": \"+91 98760 11223\",\n    \"password\": \"InstructorSecurePass123!\",\n    \"role_id\": 2,\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Create a new staff / counselor / instructor account."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "Retrieve user account info with role and permission access."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Suresh Verma\",\n    \"username\": \"suresh.instructor\",\n    \"email\": \"suresh.verma@example.com\",\n    \"phone\": \"+91 98760 11223\",\n    \"role_id\": 2,\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "Update user account details."
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}",
+								"status"
+							]
+						},
+						"description": "Toggle user active status: 1=Active, 2=Inactive."
+					},
+					"response": []
+				},
+				{
+					"name": "Record Last Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}/last-login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}",
+								"last-login"
+							]
+						},
+						"description": "Update user last login timestamp."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						},
+						"description": "Delete user account."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "09. Roles & Permissions",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles"
+							]
+						},
+						"description": "List all configured roles (e.g. Super Admin, Counselor, Instructor, Student)."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Senior Academic Counselor\",\n    \"slug\": \"counselor.senior\",\n    \"description\": \"Manages student counseling, lead conversions, and batch assignments.\",\n    \"permissions\": [1, 2, 3, 5, 6, 7],\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles"
+							]
+						},
+						"description": "Create a new role with assigned permissions."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}"
+							]
+						},
+						"description": "Fetch role details and attached permissions."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Senior Academic Counselor\",\n    \"slug\": \"counselor.senior\",\n    \"description\": \"Updated role responsibilities.\",\n    \"permissions\": [1, 2, 3, 4, 5, 6, 7],\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}"
+							]
+						},
+						"description": "Update role attributes."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}",
+								"status"
+							]
+						},
+						"description": "Toggle role status (1=Active, 2=Inactive)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role Permissions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}/permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}",
+								"permissions"
+							]
+						},
+						"description": "Get assigned permission array for a specific role."
+					},
+					"response": []
+				},
+				{
+					"name": "Sync Role Permissions",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"permissions\": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}/permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}",
+								"permissions"
+							]
+						},
+						"description": "Bulk sync permission IDs assigned to a role."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}"
+							]
+						},
+						"description": "Delete non-system role."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"permissions"
+							]
+						},
+						"description": "List all granular permissions registered in the system."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Grouped Permissions by Module",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/permissions/grouped",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"permissions",
+								"grouped"
+							]
+						},
+						"description": "List permissions organized by module (leads, admissions, batches, courses, attendance, sessions, users)."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Permission",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Export Reports\",\n    \"slug\": \"reports.export\",\n    \"module\": \"reports\",\n    \"description\": \"Export admission, attendance, and revenue reports.\",\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"permissions"
+							]
+						},
+						"description": "Define a new system permission."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Permission by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/permissions/{{permission_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"permissions",
+								"{{permission_id}}"
+							]
+						},
+						"description": "Retrieve permission details."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Permission",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Export Reports (Updated)\",\n    \"slug\": \"reports.export\",\n    \"module\": \"reports\",\n    \"description\": \"Export all analytical reports in CSV/PDF.\",\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/permissions/{{permission_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"permissions",
+								"{{permission_id}}"
+							]
+						},
+						"description": "Update permission details."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Permission Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": 1\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/permissions/{{permission_id}}/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"permissions",
+								"{{permission_id}}",
+								"status"
+							]
+						},
+						"description": "Update permission active state: 1=Active, 2=Inactive."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Permission",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/permissions/{{permission_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"permissions",
+								"{{permission_id}}"
+							]
+						},
+						"description": "Delete a permission."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
